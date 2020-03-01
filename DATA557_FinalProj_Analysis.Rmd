@@ -1,0 +1,70 @@
+---
+title: "DATA557_FinalProj_Analysis"
+output: html_document
+---
+
+```{r Load data}
+data <- read.csv("/Users/nickw/Downloads/final_dataset.csv")
+```
+
+```{r Data Prep}
+data$minutes_played <- gsub(",","",data$minutes_played)
+data <- data[as.numeric(data$minutes_played) > 360,]
+data$position <- substr(data$position,0,2)
+data$league <- substr(data$league,0,2)
+data$league <- tolower(data$league)
+data$price_num <- gsub(',','', data$price_num)
+data$price_num <- as.numeric(data$price_num)
+data$price_num <- ifelse(tolower(data$price) == 'free', 0, data$price_num)
+```
+
+Exploratory Analysis
+```{r Plot distributions}
+# Distribution Plotting
+hist(data$points_diff)
+hist(data$overall_rating)
+hist(as.numeric(data$minutes_played))
+plot(data$overall_rating,data$points_diff)
+
+# Stratified Correlation Analysis
+x <- data[data$points_diff > 0,]
+cor(x$points_diff,x$overall_rating)
+x <- data[data$points_diff < 0,]
+cor(x$points_diff,x$overall_rating)
+
+# Transfer-Rating Correlation
+cor(data$price_num,data$overall_rating)
+plot(data$overall_rating,data$price_num)
+```
+
+Question 1
+
+Question 1: How does a traded player's overall rating affect the success of the team that they were traded to (measured in point differential between the season before and the season after arrival)?
+Outcome: difference in points in this season from the previous season
+Primary predictor: the overall rating of the player before he was traded.
+Potential confounders: player's position, team, season, league, number of minutes played
+
+```{r Question 1}
+summary(lm(points_diff ~ overall_rating+factor(position)+factor(to)+factor(season)+as.numeric(minutes_played),data = data))
+```
+
+Question 2:  Whether the position affect the association between success score and rating
+Outcome: difference in success score in this season from the previous season
+Primary predictor: the overall rating of the player before he was traded
+Interaction term: position (4 positions) and rating
+Potential confounders: Parameters that will be included in the model- player's position, season, league, number of minutes played
+
+```{r Question 2}
+summary(lm(points_diff ~ position:overall_rating+overall_rating+factor(position)+factor(to)+factor(season)+as.numeric(minutes_played), data=data))
+```
+
+Question 3: Does the rating affect the association between transfer money and the impact of each player. We will use a linear regression model. The outcome for this model is the effect of each player using the beta coefficient of the rating of the first model. 
+Outcome: Transfer money
+Primary predictor: player's impact- the difference in points in this season from the previous season times the coefficient of the rating variable in the first model
+Interaction term: player's impact and rating
+Potential confounders: player's position, season, league, number of minutes played
+
+```{r Question 3}
+data <- data[!is.na(data$price_num), ]
+summary(lm(price_num ~ points_diff:overall_rating+points_diff+overall_rating+factor(position)+factor(to)+factor(season)+as.numeric(minutes_played), data=data))
+```
