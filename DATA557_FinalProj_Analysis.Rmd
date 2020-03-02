@@ -4,7 +4,7 @@ output: html_document
 ---
 
 ```{r Load data}
-data <- read.csv("/Users/nickw/Downloads/final_dataset.csv")
+data <- read.csv("/Users/nickw/OneDrive/Documents/School/DATA557/final_dataset.csv")
 ```
 
 ```{r Data Prep}
@@ -45,7 +45,7 @@ Primary predictor: the overall rating of the player before he was traded.
 Potential confounders: player's position, team, season, league, number of minutes played
 
 ```{r Question 1}
-summary(lm(points_diff ~ overall_rating+factor(position)+factor(to)+factor(season)+as.numeric(minutes_played),data = data))
+summary(lm(points_diff ~ overall_rating+factor(position)+factor(to)+factor(season)+as.numeric(minutes_played)+rank_before,data = data))
 ```
 
 Question 2:  Whether the position affect the association between success score and rating
@@ -55,7 +55,7 @@ Interaction term: position (4 positions) and rating
 Potential confounders: Parameters that will be included in the model- player's position, season, league, number of minutes played
 
 ```{r Question 2}
-summary(lm(points_diff ~ position:overall_rating+overall_rating+factor(position)+factor(to)+factor(season)+as.numeric(minutes_played), data=data))
+summary(lm(points_diff ~ position:overall_rating+overall_rating+factor(position)+factor(to)+factor(season)+as.numeric(minutes_played)+rank_before, data=data))
 ```
 
 Question 3: Does the rating affect the association between transfer money and the impact of each player. We will use a linear regression model. The outcome for this model is the effect of each player using the beta coefficient of the rating of the first model. 
@@ -66,5 +66,5 @@ Potential confounders: player's position, season, league, number of minutes play
 
 ```{r Question 3}
 data <- data[!is.na(data$price_num), ]
-summary(lm(price_num ~ points_diff:overall_rating+points_diff+overall_rating+factor(position)+factor(to)+factor(season)+as.numeric(minutes_played), data=data))
+summary(lm(price_num ~ points_diff:overall_rating+points_diff+overall_rating+factor(position)+factor(to)+factor(season)+as.numeric(minutes_played)+rank_before, data=data))
 ```
