@@ -24,7 +24,8 @@ Exploratory Analysis
 hist(data$points_diff)
 hist(data$overall_rating)
 hist(as.numeric(data$minutes_played))
-plot(data$overall_rating,data$points_diff)
+plot(data$overall_rating,data$points_diff, main = "Association between overall rating and point difference",xlab = "Overall Rating",ylab = "Point Difference")
+plot(data$rank_before,data$points_diff, main = "Association between team ranking and point difference",xlab = "Team Ranking",ylab = "Point Difference")
 
 # Stratified Correlation Analysis
 x <- data[data$points_diff > 0,]
